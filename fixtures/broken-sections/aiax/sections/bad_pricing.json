@@ -1,0 +1,21 @@
+{
+  "aiax_version": "0.1",
+  "section_id": "bad_pricing",
+  "purpose": "Section with invalid pricing model and amount.",
+  "inputs": "none",
+  "outputs": "none",
+  "pricing": {
+    "model": "invalid_model",
+    "amount": "not-a-number",
+    "currency": "USDC",
+    "rail": "x402"
+  },
+  "examples": [
+    {
+      "description": "Example call",
+      "request": {},
+      "response": {}
+    }
+  ],
+  "pact_mandate_template": null
+}

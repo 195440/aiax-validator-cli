@@ -1,0 +1,20 @@
+{
+  "aiax_version": "0.1",
+  "product": {
+    "name": "Broken Site",
+    "one_line_purpose": "Demonstrates manifest validation errors.",
+    "domain": "testing"
+  },
+  "entry_points": [
+    {
+      "id": "BAD ID!",
+      "url": "/aiax/sections/sample.json",
+      "purpose": "Invalid entry point id with uppercase and spaces.",
+      "est_tokens": 200
+    }
+  ],
+  "pricing_summary": 12345,
+  "trust_signals": {},
+  "mcp_endpoint": null,
+  "unexpected_extra": "not allowed by schema"
+}

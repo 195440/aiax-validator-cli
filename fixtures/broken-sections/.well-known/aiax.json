@@ -1,0 +1,44 @@
+{
+  "aiax_version": "0.1",
+  "product": {
+    "name": "Broken Sections Site",
+    "one_line_purpose": "Demonstrates section validation errors.",
+    "domain": "testing"
+  },
+  "entry_points": [
+    {
+      "id": "missing_field",
+      "url": "/aiax/sections/missing_field.json",
+      "purpose": "Section missing a required field.",
+      "est_tokens": 250
+    },
+    {
+      "id": "bad_pricing",
+      "url": "/aiax/sections/bad_pricing.json",
+      "purpose": "Section with invalid pricing.",
+      "est_tokens": 250
+    },
+    {
+      "id": "mismatched_id",
+      "url": "/aiax/sections/mismatched_id.json",
+      "purpose": "Section whose section_id differs from entry point id.",
+      "est_tokens": 250
+    },
+    {
+      "id": "not_json",
+      "url": "/aiax/sections/not_json.json",
+      "purpose": "Section whose file is not valid JSON.",
+      "est_tokens": 250
+    },
+    {
+      "id": "missing_section",
+      "url": "/aiax/sections/does_not_exist.json",
+      "purpose": "Section that returns 404.",
+      "est_tokens": 250
+    }
+  ],
+  "pricing_summary": null,
+  "trust_signals": {},
+  "mcp_endpoint": null,
+  "updated_at": "2026-10-21T00:00:00Z"
+}

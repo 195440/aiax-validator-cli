@@ -1,18 +1,40 @@
 {
   "name": "@godman-protocols/aiax",
-  "version": "0.1.1",
-  "description": "AIAX — Agent Interface & Agent eXperience: a protocol for agent-facing product surfaces. Minimum tokens to maximum decision-relevant information.",
+  "version": "0.2.0",
+  "description": "AIAX: Agent Interface and Agent eXperience protocol schemas and aiax-validate CLI.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "aiax-validate": "./dist/cli.js"
+  },
   "files": [
+    "dist/",
+    "src/",
+    "schemas/",
+    "examples/",
+    "fixtures/",
     "README.md",
     "SPEC.md",
     "CHANGELOG.md",
-    "BENCHMARK.md",
-    "schemas/",
-    "examples/"
+    "BENCHMARK.md"
   ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "npm run build && node --import tsx --test test/aiax-validate.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
   "keywords": [
     "agent",
     "aiax",
+    "aiax-validate",
     "agent-experience",
     "agent-interface",
     "protocol",
@@ -30,13 +52,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Godman-s/aiax.git"
+    "url": "https://github.com/195440/aiax-validator-cli.git"
   },
-  "homepage": "https://github.com/Godman-s/aiax",
+  "homepage": "https://github.com/195440/aiax-validator-cli#readme",
   "bugs": {
-    "url": "https://github.com/Godman-s/aiax/issues"
+    "url": "https://github.com/195440/aiax-validator-cli/issues"
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
   }
 }

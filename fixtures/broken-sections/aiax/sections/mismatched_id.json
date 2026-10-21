@@ -1,0 +1,16 @@
+{
+  "aiax_version": "0.1",
+  "section_id": "different_section_id",
+  "purpose": "Section with a mismatched section_id.",
+  "inputs": "none",
+  "outputs": "none",
+  "pricing": null,
+  "examples": [
+    {
+      "description": "Example call",
+      "request": {},
+      "response": {}
+    }
+  ],
+  "pact_mandate_template": null
+}

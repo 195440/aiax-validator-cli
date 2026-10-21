@@ -1,0 +1,16 @@
+{
+  "aiax_version": "0.1",
+  "section_id": "sample",
+  "purpose": "Valid sample section.",
+  "inputs": "none",
+  "outputs": "none",
+  "pricing": null,
+  "examples": [
+    {
+      "description": "Read sample.",
+      "request": { "method": "GET" },
+      "response": { "ok": true }
+    }
+  ],
+  "pact_mandate_template": null
+}

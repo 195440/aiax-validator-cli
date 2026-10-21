@@ -1,70 +1,99 @@
-# AIAX — Agent Interface & Agent Experience
+# AIAX Validator CLI (`aiax-validate`)
 
-> *"What an agent encounters when it shows up wanting to evaluate, navigate, decide, or transact."*
+Validate and score any site's AIAX v0.1 surface (`/.well-known/aiax.json` or `/aiax/manifest.json` and all declared Tier 1 capability sections) against the official AIAX schemas (`schemas/manifest.schema.json` and `schemas/section.schema.json`).
 
-**Status:** v0.1 draft · **License:** CC BY 4.0 (spec) · **Canonical URL:** github.com/Godman-s/aiax
+## Requirements
 
----
+- Node.js 20 or later
 
-AIAX is a design discipline and a protocol for **agent-facing product surfaces**. Where UI/UX optimizes for human eyes and hands, AIAX optimizes the parallel surface for an agent reader, with **minimum tokens to maximum decision-relevant information** as its hard constraint.
+## Installation
 
-A typical SaaS homepage costs an agent 5,000–15,000 tokens to evaluate. The same decision-relevant content can be delivered in 150–300 tokens via an AIAX surface. As agent operation cost becomes a meaningful share of unit economics, the surfaces that respect agent attention are the surfaces that get used.
+```bash
+npm install
+npm run build
+```
 
-## The four tiers
+Or run directly via `npx`:
 
-| Tier | What | Path | Target size |
-|------|------|------|-------------|
-| 0 | Manifest | `/.well-known/aiax.json` | ~200 tokens |
-| 1 | Capability sections | `/aiax/sections/<section>.json` | 200–1,000 tokens each |
-| 2 | Action endpoints | `/aiax/mcp` (MCP) | callable |
-| 3 | Reference data | `/aiax/reference/` | deep, on-demand |
+```bash
+npx aiax-validate <url> [--json] [--fixtures <dir>]
+```
 
-The tiering is ordered by **decision relevance**, not by topic. Agents fetch Tier 0 always, Tier 1 when investigating, Tier 2 when transacting, Tier 3 when integrating.
+## CLI Usage
 
-## In this directory
+```bash
+# Validate a live site (plain text output)
+npx aiax-validate https://lax.kognai.ai
 
-- **`SPEC.md`** — the v0.1 specification (read this first)
-- **`BENCHMARK.md`** — the token-cost benchmark methodology
-- **`schemas/manifest.schema.json`** — JSON Schema for Tier 0
-- **`schemas/section.schema.json`** — JSON Schema for Tier 1
-- **`examples/aiax.json`** — example Tier 0 manifest (Invoica)
-- **`examples/sections/pricing.json`** — example Tier 1 section
-- **`CHANGELOG.md`** — version history
+# Validate a live site and print full JSON Report
+npx aiax-validate https://www.kognai.ai --json
 
-## What AIAX is *not*
+# Validate offline against a local fixtures directory
+npx aiax-validate https://lax.kognai.ai --fixtures ./fixtures/lax-kognai --json
+```
 
-- Not a replacement for MCP, OpenAPI, or llms.txt — it composes with all three
-- Not a registry or directory protocol — that's LAX
-- Not a negotiation protocol — that's PACT
-- Not a payment protocol — that's x402 / DRS
-- Not a proprietary moat — the spec is permissive by design; the point is the discipline, not the namespace
+### Exit Codes
 
-## Relationship to the Godman Protocols
+- `0`: Site is valid (`report.ok === true`)
+- `1`: Site failed validation (`report.ok === false`)
+- `2`: CLI usage error (missing `<url>`, invalid URL, or unknown option)
 
-AIAX sits alongside PACT, LAX, DRS, and SCORE. All share the Godman Protocols' **Retrieval-First Principle** — privilege structured addressable retrieval over full-document delivery at every layer of the stack.
+## Programmatic API
 
-| Protocol | Layer | What it does |
-|----------|-------|--------------|
-| **AIAX** | Product surface | Agent-readable presentation of a product |
-| **LAX** | Discovery | Agent-to-agent capability publication |
-| **PACT** | Negotiation | Capability token signing |
-| **DRS** | Settlement | On-chain deal receipt (EAS on Base) |
-| **SCORE** | Reputation | Sovereign Constitutional Output Rating |
+```ts
+import { validateSite, createFixtureFetch } from "@godman-protocols/aiax";
 
-## Reference implementation
+// Live validation
+const report = await validateSite("https://lax.kognai.ai");
+console.log(report.ok, report.score, report.sections.length);
 
-Invoica (`invoica.ai`) will be the first published AIAX implementation, with a token-cost benchmark vs the human surface.
+// Offline validation with custom fetch or fixtures directory
+const offlineReport = await validateSite("https://lax.kognai.ai", {
+  fetch: createFixtureFetch("./fixtures/lax-kognai"),
+});
+```
 
-## Contributing
+### Report Shape
 
-This is a v0.1 draft. Comments, issues, and adoption signals welcome via the canonical channel at github.com/Godman-s/aiax (publication URL).
+```ts
+interface ValidationIssue {
+  url: string;
+  path: string; // JSON Pointer (RFC 6901) into the document
+  message: string; // Plain English message naming the field and issue
+}
 
-## Revenue covenant (Godman Protocols, 7 September 2026)
+interface SectionReport {
+  id: string;
+  url: string;
+  ok: boolean;
+  errors: ValidationIssue[];
+}
 
-Fees generated by this protocol (and by every `@godman-protocols` package) are **not** revenue of the products built on it. They are used, in this order:
+interface Report {
+  url: string;
+  manifest_url: string;
+  ok: boolean;
+  score: number; // 0 to 100 (100 with 0 errors and 0 warnings)
+  errors: ValidationIssue[];
+  warnings: ValidationIssue[];
+  sections: SectionReport[];
+}
+```
 
-1. **Ten percent** is invested in local community companies (الشركات الأهلية, sociétés communautaires under Tunisian decree-law 2022-15 revised by 2025-3) whose builders build solutions for opportunities the Kognai runtime identifies and posts in the LAX registry. No LAX opportunity, no investment.
-2. The **infrastructure** that runs the protocols (registry, receipts, attestations, hosting, monitoring) is paid at cost.
-3. The **remainder is given to charity** as donations, recipients chosen by the maintainers and disclosed per period.
+## Included Fixtures
 
-Every movement is receipted (DRS) and kept in a public-facing ledger. Canonical text: `policy/godman-revenue-covenant.txt` in the Kognai repository.
+- `fixtures/lax-kognai/`: Offline snapshot of `https://lax.kognai.ai` (passes with score 100)
+- `fixtures/www-kognai/`: Offline snapshot of `https://www.kognai.ai` (passes with score 100)
+- `fixtures/broken-manifest/`: Broken manifest demonstrating missing required field (`updated_at`), wrong type (`pricing_summary`), extra field (`unexpected_extra`), and invalid entry point id (`BAD ID!`)
+- `fixtures/broken-sections/`: Broken Tier 1 capability sections demonstrating missing field (`purpose`), invalid pricing (`model`, `amount`), mismatched `section_id`, invalid JSON, and missing 404 section
+- `fixtures/missing-manifest/`: Empty fixture demonstrating missing manifest handling
+
+## Running Tests
+
+```bash
+npm test
+```
+
+## License
+
+CC-BY-4.0 (Specification) / MIT (Validator Code)
